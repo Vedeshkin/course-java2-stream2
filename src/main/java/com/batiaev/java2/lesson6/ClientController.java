@@ -30,7 +30,7 @@ public class ClientController implements Controller {
         try {
             sock = new Socket(SERVER_ADDR, SERVER_PORT);
             in = new Scanner(sock.getInputStream());
-            out = new PrintWriter(sock.getOutputStream(), true);
+            out = new PrintWriter(sock.getOutputStream(), false);
         } catch (IOException e) {
             e.printStackTrace();
         }
@@ -52,12 +52,14 @@ public class ClientController implements Controller {
     @Override
     public void sendMessage(String msg) {
         out.println(msg);
+        out.flush();
     }
 
     @Override
     public void closeConnection() {
         try {
             sendMessage("/exit");
+
             sock.close();
             out.close();
             in.close();

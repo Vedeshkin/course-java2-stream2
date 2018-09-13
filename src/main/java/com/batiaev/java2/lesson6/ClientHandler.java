@@ -26,13 +26,40 @@ public class ClientHandler {
                     String s = sc.nextLine();
                     if (s != null && s.equals("/exit"))
                         server.unsubscribe(this);
-                    if (s != null && !s.isEmpty())
+                    if (s != null && s.startsWith("/w ")) {
+                        String[] args = s.split(" ");
+                        if (args.length == 3) {
+
+                            if (args[1].equals(getNick())) {
+                                sendMessage("Server :  You can't send message to yourself");
+                            } else if (!server.isNickTaken(args[1])) {
+                                sendMessage(String.format("Server : User %s doesn't exist", args[1]));
+                            } else {
+
+                                String msg = String.format("From %s : %s", nick, args[2]);
+                                server.sendPrivateMessage(args[1], msg);
+                                sendMessage(String.format("To user %s : %s", args[1], nick));
+
+                            }
+                        } else {
+                            sendMessage("Server : Incorrect format");
+                        }
+
+                    } else if (s != null && !s.isEmpty()) {
                         server.sendBroadcastMessage(nick + " : " + s);
+
+                    }
                 }
+
+
             }).start();
-        } catch (IOException e) {
+        } catch (
+                IOException e)
+
+        {
             e.printStackTrace();
         }
+
     }
 
     /**
@@ -63,6 +90,7 @@ public class ClientHandler {
                         String msg = "Auth ok!";
                         System.out.println(msg);
                         pw.println(msg);
+                        pw.flush();
                         server.subscribe(this);
                         break;
                     }

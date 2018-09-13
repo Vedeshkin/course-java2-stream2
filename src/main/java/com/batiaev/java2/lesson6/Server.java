@@ -57,6 +57,7 @@ public class Server {
         }
     }
 
+
     public AuthService getAuthService() {
         return authService;
     }
@@ -81,5 +82,16 @@ public class Server {
         sendBroadcastMessage(msg);
         System.out.println(msg);
         clients.remove(clientHandler);
+    }
+
+    public void sendPrivateMessage(String toUser, String msg) {
+
+        for (ClientHandler client : clients)
+        {
+            if(client.getNick().equals(toUser)){
+                client.sendMessage(msg);
+                break;
+            }
+        }
     }
 }
