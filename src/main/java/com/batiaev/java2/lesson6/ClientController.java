@@ -1,14 +1,15 @@
 package com.batiaev.java2.lesson6;
 
-import java.io.IOException;
-import java.io.PrintWriter;
+import java.io.*;
 import java.net.Socket;
+import java.util.ArrayList;
 import java.util.Random;
 import java.util.Scanner;
 
 public class ClientController implements Controller {
     private final static String SERVER_ADDR = "localhost";
     private final static int SERVER_PORT = 8189;
+    private final static String HISTORY_LOG = "history.log";
     private ClientUI ui;
 
     private Socket sock;
@@ -23,7 +24,68 @@ public class ClientController implements Controller {
     public void showUI(ClientUI ui) {
         this.ui = ui;
         ui.showUI();
+        loadHistory();
         sendMessage("/auth login" + index + " pass" + index);
+    }
+
+    @Override
+    public void storeMessage(String msg) {
+        File f = new File(HISTORY_LOG);
+        if (!f.exists()) {
+            try {
+                f.createNewFile();
+            } catch (IOException e) {
+
+            }
+        }
+        try( PrintWriter pw = new PrintWriter(new FileWriter(f,true))){
+            pw.println(msg);
+
+        }catch (IOException e) {
+            e.printStackTrace();
+        }
+
+    }
+
+    @Override
+    public void loadHistory()
+    {
+        File f = new File(HISTORY_LOG);
+        if (!f.exists()){
+            System.out.println("History not found");
+            return;
+        }
+        StringBuilder sb = new StringBuilder();
+        int readLines = 0;
+        int lines = 100;
+        ArrayList<String> history = new ArrayList<>();
+        try ( RandomAccessFile randomAccessFile = new RandomAccessFile(f,"r"))
+        {
+            long fileLength = f.length() - 1;
+            randomAccessFile.seek(fileLength);
+            for(long pointer = fileLength; pointer >= 0; pointer--){
+                randomAccessFile.seek(pointer);
+                char c;
+                c = (char)randomAccessFile.read();
+                if(c == '\n'){
+                    readLines++;
+                    if(readLines == lines)
+                        break;
+                }
+                sb.append(c);
+            }
+            history.add(sb.reverse().toString());
+
+
+
+        } catch (IOException e) {
+            e.printStackTrace();
+        }
+        for (int i = history.size() - 1;0<= i; i--)
+        {
+            ui.addMessage(history.get(i));
+        }
+
     }
 
     private void initConnection() {

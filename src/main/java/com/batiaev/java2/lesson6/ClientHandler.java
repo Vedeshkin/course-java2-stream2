@@ -45,7 +45,14 @@ public class ClientHandler {
                             sendMessage("Server : Incorrect format");
                         }
 
-                    } else if (s != null && !s.isEmpty()) {
+                    } else if (s != null && s.startsWith("/rename")){
+                        String [] args = s.split(" ");
+                        changeNick(args[1]);
+
+                    }
+
+
+                    else if (s != null && !s.isEmpty()) {
                         server.sendBroadcastMessage(nick + " : " + s);
 
                     }
@@ -60,6 +67,13 @@ public class ClientHandler {
             e.printStackTrace();
         }
 
+    }
+
+    private void changeNick(String newNick) {
+        if (server.getAuthService().changeNick(newNick)){
+            nick = newNick;
+            sendMessage("Server : Nick was changed to : " +newNick);
+        }else sendMessage("Server: ERROR.Nick wasn't changed");
     }
 
     /**

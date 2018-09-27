@@ -57,7 +57,11 @@ public class Client extends JFrame implements ClientUI {
     public void addMessage(String w) {
         jta.append(w);
         jta.append("\n");
+        controller.storeMessage(w);
     }
+
+
+
 
     @Override
     public void showUI() {

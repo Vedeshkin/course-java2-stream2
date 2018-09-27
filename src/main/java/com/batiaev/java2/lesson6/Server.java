@@ -2,6 +2,7 @@ package com.batiaev.java2.lesson6;
 
 import com.batiaev.java2.lesson7.AuthService;
 import com.batiaev.java2.lesson7.BaseAuthService;
+import com.batiaev.java2.lesson7.SQLAuthService;
 
 import java.io.IOException;
 import java.net.ServerSocket;
@@ -35,8 +36,8 @@ public class Server {
     }
 
     public static void main(String[] args) {
-        AuthService baseAuthService = new BaseAuthService();
-        Server server = new Server(baseAuthService);
+        AuthService authService = new SQLAuthService();
+        Server server = new Server(authService);
         server.start();
     }
 

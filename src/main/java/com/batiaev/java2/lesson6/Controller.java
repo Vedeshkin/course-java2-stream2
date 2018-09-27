@@ -6,4 +6,8 @@ public interface Controller {
     void closeConnection();
 
     void showUI(ClientUI clientUI);
+
+    void storeMessage(String msg);
+
+    void loadHistory();
 }

@@ -21,4 +21,10 @@ public class BaseAuthService implements AuthService {
         }
         return null;
     }
+
+    @Override // we don't need this here...
+    public boolean changeNick(String nick) {
+        return false;
+    }
+
 }
