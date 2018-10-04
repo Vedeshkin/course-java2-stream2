@@ -5,6 +5,8 @@ import java.net.Socket;
 import java.util.ArrayList;
 import java.util.Random;
 import java.util.Scanner;
+import java.util.concurrent.ExecutorService;
+import java.util.concurrent.Executors;
 
 public class ClientController implements Controller {
     private final static String SERVER_ADDR = "localhost";
@@ -96,19 +98,20 @@ public class ClientController implements Controller {
         } catch (IOException e) {
             e.printStackTrace();
         }
-
-        new Thread(() -> {
-            try {
-                while (true) {
-                    if (in.hasNext()) {
-                        String w = in.nextLine();
-                        if (w.startsWith("end session")) break;
-                        ui.addMessage(w);
+        ExecutorService executorService = Executors.newCachedThreadPool();
+        executorService.execute(
+                () -> {
+                    try {
+                        while (true) {
+                            if (in.hasNext()) {
+                                String w = in.nextLine();
+                                if (w.startsWith("end session")) break;
+                                ui.addMessage(w);
+                            }
+                        }
+                    } catch (Exception e) {
                     }
-                }
-            } catch (Exception e) {
-            }
-        }).start();
+                });
     }
 
     @Override

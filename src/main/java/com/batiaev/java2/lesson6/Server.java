@@ -36,7 +36,7 @@ public class Server {
     }
 
     public static void main(String[] args) {
-        AuthService authService = new SQLAuthService();
+        AuthService authService = new BaseAuthService();
         Server server = new Server(authService);
         server.start();
     }

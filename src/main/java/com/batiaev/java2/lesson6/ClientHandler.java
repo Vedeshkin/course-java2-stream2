@@ -4,22 +4,26 @@ import java.io.IOException;
 import java.io.PrintWriter;
 import java.net.Socket;
 import java.util.Scanner;
+import java.util.concurrent.Executor;
+import java.util.concurrent.ExecutorService;
+import java.util.concurrent.Executors;
 
 public class ClientHandler {
-    //    private Socket socket;
+    private Socket socket;
     private Server server;
     private PrintWriter pw;
     private Scanner sc;
     private String nick;
 
     public ClientHandler(Socket socket, Server server) {
-//        this.socket = socket;
+      this.socket = socket;
         this.server = server;
 
         try {
             sc = new Scanner(socket.getInputStream());
             pw = new PrintWriter(socket.getOutputStream(), true);
-            new Thread(() -> {
+            ExecutorService executorService = Executors.newCachedThreadPool();
+            executorService.execute(() -> {
                 auth();
                 System.out.println(nick + " handler waiting for new massages");
                 while (socket.isConnected()) {
@@ -59,7 +63,7 @@ public class ClientHandler {
                 }
 
 
-            }).start();
+            });
         } catch (
                 IOException e)
 
