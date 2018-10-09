@@ -3,6 +3,8 @@ package com.batiaev.java2.lesson6;
 import com.batiaev.java2.lesson7.AuthService;
 import com.batiaev.java2.lesson7.BaseAuthService;
 import com.batiaev.java2.lesson7.SQLAuthService;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 import java.io.IOException;
 import java.net.ServerSocket;
@@ -11,6 +13,7 @@ import java.util.ArrayList;
 import java.util.List;
 
 public class Server {
+    private  static final Logger logger = LoggerFactory.getLogger(Server.class);
     private ServerSocket serverSocket;
     private AuthService authService;
     private List<ClientHandler> clients = new ArrayList<>();
@@ -18,19 +21,21 @@ public class Server {
     public Server(AuthService authService) {
         this.authService = authService;
         try {
+            logger.info("Attempt to start up server on port 8189");
             serverSocket = new ServerSocket(8189);
-            System.out.println("Сервер запущен, ожидаем подключения...");
+            logger.info("Сервер запущен, ожидаем подключения...");
         } catch (IOException e) {
-            System.out.println("Ошибка инициализации сервера");
+            logger.error("Ошибка инициализации сервера");
             close();
         }
     }
 
     public void close() {
         try {
+            logger.info("Shutting down the server");
             serverSocket.close();
         } catch (IOException e) {
-            e.printStackTrace();
+            logger.error("The following error has occurred during the server shutdown:",e);
         }
         System.exit(0);
     }
@@ -44,16 +49,18 @@ public class Server {
     private void start() {
         while (true) {
             try {
+                logger.info("Awaiting for new connections");
                 Socket clientSocket = serverSocket.accept();
                 ClientHandler clientHandler = new ClientHandler(clientSocket, this);
             } catch (IOException e) {
-                e.printStackTrace();
+                logger.error("The following IO error has occurred: ",e);
             }
         }
     }
 
     public void sendBroadcastMessage(String msg) {
         for (ClientHandler client : clients) {
+            logger.info("Broadcasting message: "+ msg);
             client.sendMessage(msg);
         }
     }
@@ -73,13 +80,15 @@ public class Server {
 
     public void subscribe(ClientHandler clientHandler) {
         String msg = "Клиент " + clientHandler.getNick() + " подключился";
+        logger.info(String.format("Client %s connected \n",clientHandler.getNick()));
         sendBroadcastMessage(msg);
-        System.out.println(msg);
+        logger.info(msg);
         clients.add(clientHandler);
     }
 
     public void unsubscribe(ClientHandler clientHandler) {
         String msg = "Клиент " + clientHandler.getNick() + " отключился";
+        logger.info(String.format("Client %s disconnected \n",clientHandler.getNick()));
         sendBroadcastMessage(msg);
         System.out.println(msg);
         clients.remove(clientHandler);
@@ -90,6 +99,7 @@ public class Server {
         for (ClientHandler client : clients)
         {
             if(client.getNick().equals(toUser)){
+                logger.info(String.format("Sending private message to %s",client.getNick()));
                 client.sendMessage(msg);
                 break;
             }

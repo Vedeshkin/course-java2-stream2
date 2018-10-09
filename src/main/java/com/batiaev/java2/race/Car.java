@@ -1,13 +1,24 @@
 package com.batiaev.java2.race;
 
+import sun.applet.Main;
+
+import java.util.concurrent.CountDownLatch;
+
 /**
  * Created by Vedeshkin on 10/8/2018.
  * All right reserved.
  */
 public class Car  implements Runnable{
     private static int CARS_COUNT;
+    private static final CountDownLatch READY_TO_GO;
+
+    public static CountDownLatch getReadyToGo() {
+        return READY_TO_GO;
+    }
+
     static {
         CARS_COUNT = 0;
+        READY_TO_GO = new CountDownLatch(MainClass.CARS_COUNT +1 );
     }
     private Race race;
     private int speed;
@@ -21,8 +32,7 @@ public class Car  implements Runnable{
     public Car(Race race, int speed) {
         this.race = race;
         this.speed = speed;
-        CARS_COUNT++;
-        this.name = "Участник #" + CARS_COUNT;
+        this.name = "Участник #" + ++CARS_COUNT;
     }
     @Override
     public void run() {
@@ -30,8 +40,7 @@ public class Car  implements Runnable{
             System.out.println(this.name + " готовится");
             Thread.sleep(500 + (int)(Math.random() * 800));
             System.out.println(this.name + " готов");
-            MainClass.READY_TO_GO.countDown();
-            MainClass.READY_TO_GO.await();
+         READY_TO_GO.countDown();
 
         for (int i = 0; i < race.getStages().size(); i++) {
             race.getStages().get(i).go(this);
